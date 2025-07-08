@@ -1,6 +1,25 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import {useState} from'react'
+import axiosInstance from '../config/axios.js'
 
 const Login = () => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const navigate = useNavigate()
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    console.log("Sending to backend: ", { email, password });
+  
+    try {
+      const response = await axiosInstance.post('/users/login', { email, password });
+      console.log("Login successful:", response.data);
+      navigate('/');
+    } catch (error) {
+      console.error("Login failed:", error.response?.data || error.message);
+    }
+  };
+  
   return (
     <div className="min-h-screen flex flex-col md:flex-row font-sans">
       {/* Left Panel - DevSync AI Info */}
@@ -29,13 +48,14 @@ const Login = () => {
             Login to DevSync
           </h2>
 
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={submitHandler}>
             {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Email
               </label>
               <input
+                onChange={(e)=>{setEmail(e.target.value)}}
                 type="email"
                 placeholder="you@example.com"
                 className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -49,6 +69,7 @@ const Login = () => {
                 Password
               </label>
               <input
+                onChange={(e)=>{setPassword(e.target.value)}}
                 type="password"
                 placeholder="••••••••"
                 className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500"

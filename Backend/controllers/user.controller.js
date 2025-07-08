@@ -19,26 +19,69 @@ export const createUserController = async (req, res) => {
     }
 }
 
-export const loginUserController = async (req, res)=>{
-    const errors = validationResult(req)
-    if(!errors.isEmpty()){
-        return res.status(400).json({message: errors.array()})
+// export const loginUserController = async (req, res)=>{
+//     const errors = validationResult(req)
+//     if(!errors.isEmpty()){
+//         return res.status(400).json({message: errors.array()})
+//     }
+//     try{
+//         console.log("Login attempt received");
+//         const {email, password} = req.body
+//         const user = await userModel.findOne({email}).select('+password')
+//         if(!user){
+//             res.status(401).json({message: "user having this email does not exist"})
+//         }
+
+//         const isMatch = user.isValidPassword(password)
+//         if(!isMatch){
+//             res.status(401).json({message: "Wrong password entered"})
+//         }
+//         const token = await user.generateJWT()
+//         res.status(400).json({user, token})
+//     }catch(error){
+//         res.status(400).json({message: "Wrong credentials entered"})
+//     }
+// }
+
+export const loginUserController = async (req, res) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
     }
-    try{
-        const {email, password} = req.body
-        const user = await userModel.findOne({email}).select('+password')
-        if(!user){
-            res.status(401).json({message: "user having this email does not exist"})
+
+    try {
+
+        const { email, password } = req.body;
+
+        const user = await userModel.findOne({ email }).select('+password');
+
+        if (!user) {
+            return res.status(401).json({
+                errors: 'Invalid credentials'
+            })
         }
 
-        const isMatch = user.isValidPassword(password)
-        if(!isMatch){
-            res.status(401).json({message: "Wrong password entered"})
+        const isMatch = await user.isValidPassword(password);
+
+        if (!isMatch) {
+            return res.status(401).json({
+                errors: 'Invalid credentials'
+            })
         }
-        const token = await user.generateJWT()
-        res.status(400).json({user, token})
-    }catch(error){
-        res.status(400).json({message: "Wrong credentials entered"})
+
+        const token = await user.generateJWT();
+
+        delete user._doc.password;
+
+        res.status(200).json({ user, token });
+
+
+    } catch (err) {
+
+        console.log(err);
+
+        res.status(400).send(err.message);
     }
 }
 

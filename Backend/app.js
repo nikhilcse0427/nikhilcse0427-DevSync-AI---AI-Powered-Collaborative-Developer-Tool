@@ -1,20 +1,27 @@
-import express from 'express'
-import cookieParser from 'cookie-parser'
-import morgan from 'morgan'
-import userRoutes from './routes/user.route.js'
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import morgan from 'morgan';
+import cors from 'cors'; // ✅
 
-const app = express()
+import userRoutes from './routes/user.route.js';
 
-//Middlewares
-app.use(morgan('dev'))
-app.use(express.json())
-app.use(express.urlencoded({extended: true}))
+const app = express();
 
-app.use('/users', userRoutes)
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
+
+// Middlewares
+app.use(morgan('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+app.use('/users', userRoutes);
 
 app.get('/', (req, res) => {
-  res.send("<h1>Server is running</h1>")
-})
+  res.send('<h1>Server is running</h1>');
+});
 
 export default app;
-
