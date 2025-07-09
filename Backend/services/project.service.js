@@ -3,6 +3,7 @@ import projectModel from '../models/project.model'
 export const createProject = async ({name, object_id})=>{
   try{
     const {name, object_id} = req.body
+    //name, objectId
     if(!name || !userId){
       throw new error("name and onject_id both required")
     }
